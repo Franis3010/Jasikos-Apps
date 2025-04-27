@@ -97,6 +97,22 @@
                     <label class="block font-medium mb-1">Address</label>
                     <p>{{ $service->address ?? '-' }}</p>
                 </div>
+
+                <div class="mt-6 flex space-x-4">
+                    <form action="{{ route('wishlist.add', $service->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="px-6 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold">
+                            Add to Wishlist
+                        </button>
+                    </form>
+
+                    <form action="{{ route('cart.add', $service->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold">
+                            Add to Cart
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

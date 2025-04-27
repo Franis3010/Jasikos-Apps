@@ -9,13 +9,10 @@ class ServiceSeeder extends Seeder
 {
     public function run(): void
     {
-        $services = ['Budi', 'Anggi', 'Restu'];
+        $services = require database_path('seeders/data/services.php');
 
-        foreach ($services as $name) {
-            Service::create([
-                'name' => $name,
-                'image' => 'services/' . strtolower($name) . '.png',
-            ]);
+        foreach ($services as $serviceData) {
+            Service::create($serviceData);
         }
     }
 }

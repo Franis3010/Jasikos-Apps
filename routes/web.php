@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -17,6 +19,8 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/service/{id}', [ServiceController::class, 'show'])->name('service.show');
 Route::get('/service/{id}/edit', [ServiceController::class, 'edit'])->name('service.edit');
 Route::put('/service/{id}', [ServiceController::class, 'update'])->name('service.update');
+Route::post('/wishlist/add/{service}', [WishlistController::class, 'add'])->name('wishlist.add');
+Route::post('/cart/add/{service}', [CartController::class, 'add'])->name('cart.add');
 
 Route::middleware('auth')->get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::middleware('auth')->post('/profile', [ProfileController::class, 'update'])->name('profile.update');
