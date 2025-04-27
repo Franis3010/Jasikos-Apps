@@ -10,6 +10,10 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
+        if (auth()->check()) {
+            return redirect()->route('home');
+        }
+
         session()->flash('showLogin', true);
         return redirect()->route('home');
     }

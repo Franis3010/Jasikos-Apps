@@ -6,14 +6,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
-<body class="bg-white" x-data="{ showLogin: false, showRegister: false, showProfile: false }">
+<body class="bg-white" x-data="{showLogin: {{ session('showLogin') ? 'true' : 'false' }}, showRegister: false, showProfile: false}">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
     <!-- Logo -->
-    <div class="flex-shrink-0">
-        <a href="{{ url('/') }}">
-            <img src="{{ asset('storage/services/jasikos-logo.png') }}" alt="Jasikos Logo" class="h-12">
-        </a>
-    </div>
+        <div class="flex-shrink-0">
+            <a href="{{ url('/') }}">
+                <img src="{{ asset('storage/services/jasikos-logo.png') }}" alt="Jasikos Logo" class="h-12">
+            </a>
+        </div>
 
     <!-- Search + Icons -->
     <div class="flex-1 mx-8 flex items-center space-x-4">
@@ -94,64 +94,64 @@
 
     <!-- Login Modal -->
     <div x-show="showLogin" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl w-full max-w-md relative">
-        <button @click="showLogin = false" class="absolute top-2 right-2 text-gray-600 hover:text-black">&times;</button>
-        <h2 class="text-2xl font-bold mb-4">Login</h2>
-        <form action="{{ route('login') }}" method="POST">
-            @csrf
-            <input type="email" name="email" placeholder="Email" class="w-full mb-3 p-2 border rounded" required>
-            @error('email')
-                <div class="text-red-500 text-sm">{{ $message }}</div>
-            @enderror
+        <div class="bg-white p-6 rounded-xl w-full max-w-md relative">
+            <button @click="showLogin = false" class="absolute top-2 right-2 text-gray-600 hover:text-black">&times;</button>
+            <h2 class="text-2xl font-bold mb-4">Login</h2>
+            <form action="{{ route('login') }}" method="POST">
+                @csrf
+                <input type="email" name="email" placeholder="Email" class="w-full mb-3 p-2 border rounded" required>
+                @error('email')
+                    <div class="text-red-500 text-sm">{{ $message }}</div>
+                @enderror
 
-            <input type="password" name="password" placeholder="Password" class="w-full mb-3 p-2 border rounded" required>
-            @error('password')
-                <div class="text-red-500 text-sm">{{ $message }}</div>
-            @enderror
+                <input type="password" name="password" placeholder="Password" class="w-full mb-3 p-2 border rounded" required>
+                @error('password')
+                    <div class="text-red-500 text-sm">{{ $message }}</div>
+                @enderror
 
-            <button type="submit" class="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Login</button>
-        </form>
+                <button type="submit" class="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Login</button>
+            </form>
 
-        <!-- Register prompt (Restored original link) -->
-        <p class="mt-4 text-sm text-gray-600">Don't have an account? <a href="#" @click="showRegister = true" class="text-blue-500 hover:underline">Register here</a></p>
+            <!-- Register prompt (Restored original link) -->
+            <p class="mt-4 text-sm text-gray-600">Don't have an account? <a href="#" @click="showRegister = true" class="text-blue-500 hover:underline">Register here</a></p>
+        </div>
     </div>
-</div>
 
     <div x-show="showRegister" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl w-full max-w-md relative">
-        <button @click="showRegister = false" class="absolute top-2 right-2 text-gray-600 hover:text-black">&times;</button>
-        <h2 class="text-2xl font-bold mb-4">Register</h2>
-        
-        <form action="{{ route('register.submit') }}" method="POST">
-            @csrf
+        <div class="bg-white p-6 rounded-xl w-full max-w-md relative">
+            <button @click="showRegister = false" class="absolute top-2 right-2 text-gray-600 hover:text-black">&times;</button>
+            <h2 class="text-2xl font-bold mb-4">Register</h2>
+            
+            <form action="{{ route('register.submit') }}" method="POST">
+                @csrf
 
-            <!-- Name Field -->
-            <input type="text" name="name" placeholder="Name" class="w-full mb-3 p-2 border rounded" required>
-            @error('name')
-                <div class="text-red-500 text-sm">{{ $message }}</div>
-            @enderror
+                <!-- Name Field -->
+                <input type="text" name="name" placeholder="Name" class="w-full mb-3 p-2 border rounded" required>
+                @error('name')
+                    <div class="text-red-500 text-sm">{{ $message }}</div>
+                @enderror
 
-            <!-- Email Field -->
-            <input type="email" name="email" placeholder="Email" class="w-full mb-3 p-2 border rounded" required>
-            @error('email')
-                <div class="text-red-500 text-sm">{{ $message }}</div>
-            @enderror
+                <!-- Email Field -->
+                <input type="email" name="email" placeholder="Email" class="w-full mb-3 p-2 border rounded" required>
+                @error('email')
+                    <div class="text-red-500 text-sm">{{ $message }}</div>
+                @enderror
 
-            <!-- Password Field -->
-            <input type="password" name="password" placeholder="Password" class="w-full mb-3 p-2 border rounded" required>
-            @error('password')
-                <div class="text-red-500 text-sm">{{ $message }}</div>
-            @enderror
+                <!-- Password Field -->
+                <input type="password" name="password" placeholder="Password" class="w-full mb-3 p-2 border rounded" required>
+                @error('password')
+                    <div class="text-red-500 text-sm">{{ $message }}</div>
+                @enderror
 
-            <!-- Confirm Password Field -->
-            <input type="password" name="password_confirmation" placeholder="Confirm Password" class="w-full mb-3 p-2 border rounded" required>
-            @error('password_confirmation')
-                <div class="text-red-500 text-sm">{{ $message }}</div>
-            @enderror
+                <!-- Confirm Password Field -->
+                <input type="password" name="password_confirmation" placeholder="Confirm Password" class="w-full mb-3 p-2 border rounded" required>
+                @error('password_confirmation')
+                    <div class="text-red-500 text-sm">{{ $message }}</div>
+                @enderror
 
-            <button type="submit" class="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600">Register</button>
-        </form>
+                <button type="submit" class="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600">Register</button>
+            </form>
+        </div>
     </div>
-</div>
 </body>
 </html>

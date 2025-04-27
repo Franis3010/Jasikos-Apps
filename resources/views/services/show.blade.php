@@ -34,11 +34,9 @@
 
         @auth
         <!-- If User is Authenticated -->
-        <div x-data="{ showProfile: false }" class="relative">
-            <button @click="showProfile = !showProfile" class="text-gray-600 hover:text-blue-500">
-                <!-- User Profile Picture -->
-                <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Profile" class="h-8 w-8 rounded-full">
-            </button>
+        <button @click="showProfile = !showProfile" class="text-gray-600 hover:text-blue-500 relative">
+            <!-- User Profile Picture -->
+            <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Profile" class="h-8 w-8 rounded-full">
 
             <!-- Profile Dropdown -->
             <div x-show="showProfile" @click.outside="showProfile = false" class="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4">
@@ -57,7 +55,7 @@
                     <button type="submit" class="block py-2 text-sm text-red-500 w-full text-left">Logout</button>
                 </form>
             </div>
-        </div>
+        </button>
         @else
         <!-- If User is Not Authenticated -->
         <button @click="showLogin = true" class="text-gray-600 hover:text-blue-500">
