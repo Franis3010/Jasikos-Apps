@@ -45,4 +45,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function wishlist()
+    {
+        return $this->belongsToMany(Service::class, 'wishlists');
+    }
+
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
 }

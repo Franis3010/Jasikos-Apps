@@ -15,4 +15,4 @@ class ServiceSeeder extends Seeder
             Service::create($serviceData);
         }
     }
-}
+}   
