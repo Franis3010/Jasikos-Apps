@@ -19,7 +19,20 @@ class WishlistController extends Controller
 
         $user->wishlist()->attach($serviceId);
 
-        return back()->with('success', 'Service added to your wishlist!');
+        return redirect()->route('wishlist.index')->with('success', 'Service added to your wishlist!');
+    }
+
+    public function remove($id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in to remove from wishlist.');
+        }
+
+        $user->wishlist()->detach($id);
+
+        return back()->with('success', 'Service removed from your wishlist.');
     }
 
     public function index()

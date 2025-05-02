@@ -5,28 +5,20 @@
     <title>My Wishlist</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+<body>
+<div class="container mx-auto px-4 py-4 flex items-center justify-between">
         <!-- Logo -->
         <div class="flex-shrink-0">
             <a href="{{ url('/') }}">
-                <img src="{{ asset('storage/services/jasikos-logo.png') }}" alt="Jasikos Logo" class="h-12">
+            <img 
+                src="{{ asset('storage/logo/jasikos-logo.png') }}" 
+                alt="Jasikos Logo" class="h-12">
             </a>
         </div>
 
         <!-- Search + Icons -->
         <div class="flex-1 mx-8 flex items-center space-x-4">
-            @if (Request::is('/'))
-                <form action="{{ route('service.search') }}" method="GET" class="w-full flex">
-                    <input
-                        type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Search services..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                </form>
-            @endif
+
 
             <!-- Wishlist Icon -->
             <a href="{{ route('wishlist.index') }}" class="text-gray-600 hover:text-red-500">
@@ -45,14 +37,62 @@
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 7M7 13l-1.293 2.586A1 1 0 007 17h10a1 1 0 00.894-1.447L17 13M10 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z"/>
                 </svg>
             </a>
+
+            <form action="{{ route('home') }}" method="GET" class="w-full flex">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search services..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+            </form>
         </div>
 
-        <!-- Login Button -->
-        <button @click="showLogin = true" class="text-gray-600 hover:text-blue-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 20c0 1.104.896 2 2 2h10c1.104 0 2-.896 2-2v-2c0-3.314-4-5-6-5s-6 1.686-6 5v2zM12 11c2.209 0 4-1.791 4-4S14.209 3 12 3 8 4.791 8 7s1.791 4 4 4z"/>
-            </svg>
-        </button>
+        <!-- Profile Dropdown Button -->
+        <div x-data="{ showProfile: false }" class="relative">
+            <!-- Icon Button -->
+            <button @click="showProfile = !showProfile" class="focus:outline-none">
+                <img src="{{ auth()->user()->profile_picture 
+                    ? asset('storage/' . auth()->user()->profile_picture) 
+                    : asset('storage/logo/profile.png') }}" 
+                    alt="Profile" 
+                    class="h-8 w-8 rounded-full object-cover">
+            </button>
+
+            <!-- Dropdown Content -->
+            <div x-show="showProfile" 
+                @click.outside="showProfile = false" 
+                x-cloak
+                class="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg p-4 z-50 text-center">
+                
+                <!-- User Info -->
+                <div class="flex flex-col items-center mb-4 space-y-2">
+                    <img src="{{ auth()->user()->profile_picture 
+                        ? asset('storage/' . auth()->user()->profile_picture) 
+                        : asset('storage/logo/profile.png') }}"
+                        alt="Profile"
+                        class="h-12 w-12 rounded-full object-cover">
+                    <h3 class="font-semibold text-gray-800">{{ auth()->user()->name }}</h3>
+                    <p class="text-sm text-gray-600">{{ auth()->user()->email }}</p>
+                </div>
+
+                <!-- Edit Profile -->
+                <a href="{{ route('profile.edit') }}" 
+                class="block py-2 text-sm text-blue-500 hover:bg-gray-100 rounded">
+                    Edit Profile
+                </a>
+
+                <!-- Logout -->
+                <form action="{{ route('logout') }}" method="POST" class="mt-2">
+                    @csrf
+                    <button type="submit" 
+                            class="block py-2 text-sm text-red-500 w-full hover:bg-gray-100 rounded">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <div class="container mx-auto px-4 py-8">

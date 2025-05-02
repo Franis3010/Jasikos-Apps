@@ -7,21 +7,15 @@
         <!-- Logo -->
         <div class="flex-shrink-0">
             <a href="{{ url('/') }}">
-                <img src="{{ asset('storage/services/jasikos-logo.png') }}" alt="Jasikos Logo" class="h-12">
+            <img 
+                src="{{ asset('storage/logo/jasikos-logo.png') }}" 
+                alt="Jasikos Logo" class="h-12">
             </a>
         </div>
 
         <!-- Search + Icons -->
         <div class="flex-1 mx-8 flex items-center space-x-4">
-            <form action="{{ route('service.search') }}" method="GET" class="w-full flex">
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Search services..."
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-            </form>
+
 
             <!-- Wishlist Icon -->
             <a href="{{ route('wishlist.index') }}" class="text-gray-600 hover:text-red-500">
@@ -42,38 +36,50 @@
             </a>
         </div>
 
-        @auth
-        <!-- If User is Authenticated -->
-        <button @click="showProfile = !showProfile" class="text-gray-600 hover:text-blue-500 relative">
-            <!-- User Profile Picture -->
-            <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Profile" class="h-8 w-8 rounded-full">
+        <!-- Profile Dropdown Button -->
+        <div x-data="{ showProfile: false }" class="relative">
+            <!-- Icon Button -->
+            <button @click="showProfile = !showProfile" class="focus:outline-none">
+                <img src="{{ auth()->user()->profile_picture 
+                    ? asset('storage/' . auth()->user()->profile_picture) 
+                    : asset('storage/logo/profile.png') }}" 
+                    alt="Profile" 
+                    class="h-8 w-8 rounded-full object-cover">
+            </button>
 
-            <!-- Profile Dropdown -->
-            <div x-show="showProfile" @click.outside="showProfile = false" class="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4">
-                <div class="flex items-center space-x-2 mb-4">
-                    <!-- User Profile Picture in the Dropdown -->
-                    <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Profile" class="h-12 w-12 rounded-full">
-                    <div>
-                        <h3 class="font-semibold">{{ auth()->user()->name }}</h3>
-                        <p class="text-sm text-gray-600">{{ auth()->user()->email }}</p>
-                    </div>
+            <!-- Dropdown Content -->
+            <div x-show="showProfile" 
+                @click.outside="showProfile = false" 
+                x-cloak
+                class="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg p-4 z-50 text-center">
+                
+                <!-- User Info -->
+                <div class="flex flex-col items-center mb-4 space-y-2">
+                    <img src="{{ auth()->user()->profile_picture 
+                        ? asset('storage/' . auth()->user()->profile_picture) 
+                        : asset('storage/logo/profile.png') }}"
+                        alt="Profile"
+                        class="h-12 w-12 rounded-full object-cover">
+                    <h3 class="font-semibold text-gray-800">{{ auth()->user()->name }}</h3>
+                    <p class="text-sm text-gray-600">{{ auth()->user()->email }}</p>
                 </div>
 
-                <a href="{{ route('profile.edit') }}" class="block py-2 text-sm text-blue-500 hover:bg-gray-100">Edit Profile</a>
+                <!-- Edit Profile -->
+                <a href="{{ route('profile.edit') }}" 
+                class="block py-2 text-sm text-blue-500 hover:bg-gray-100 rounded">
+                    Edit Profile
+                </a>
+
+                <!-- Logout -->
                 <form action="{{ route('logout') }}" method="POST" class="mt-2">
                     @csrf
-                    <button type="submit" class="block py-2 text-sm text-red-500 w-full text-left">Logout</button>
+                    <button type="submit" 
+                            class="block py-2 text-sm text-red-500 w-full hover:bg-gray-100 rounded">
+                        Logout
+                    </button>
                 </form>
             </div>
-        </button>
-        @else
-        <!-- If User is Not Authenticated -->
-        <button @click="showLogin = true" class="text-gray-600 hover:text-blue-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 20c0 1.104.896 2 2 2h10c1.104 0 2-.896 2-2v-2c0-3.314-4-5-6-5s-6 1.686-6 5v2zM12 11c2.209 0 4-1.791 4-4S14.209 3 12 3 8 4.791 8 7s1.791 4 4 4z"/>
-            </svg>
-        </button>
-        @endauth
+        </div>
     </div>
 
     <!-- Service Detail Page -->

@@ -8,14 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
+    protected $redirectTo = '/';
+
     public function showLoginForm()
     {
-        if (auth()->check()) {
-            return redirect()->route('home');
-        }
-
-        session()->flash('showLogin', true);
-        return redirect()->route('home');
+        return view('auth.login');
     }
 
     public function login(Request $request)
@@ -23,19 +20,17 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->route('home_user');
+            return redirect()->intended($this->redirectTo);
         }
 
-        return redirect()->route('home')->with('login_error', 'The provided credentials do not match our records.');
+        return back()->withErrors([
+            'email' => 'Invalid credentials.',
+        ])->withInput();
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
         return redirect()->route('home');
     }
 }
