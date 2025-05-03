@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <title>My Wishlist</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
 </head>
-<body>
-<div class="container mx-auto px-4 py-4 flex items-center justify-between">
+<body x-data="{ showProfile: false }">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
         <!-- Logo -->
         <div class="flex-shrink-0">
             <a href="{{ url('/') }}">

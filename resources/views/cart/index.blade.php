@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <title>Your Cart</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+    <script src="//unpkg.com/alpinejs" defer></script>
 </head>
-<body>
+<body x-data="{ showProfile: false }"> 
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
         <!-- Logo -->
         <div class="flex-shrink-0">
@@ -89,31 +90,30 @@
 
         @if (count($cart) > 0)
             <div class="space-y-4">
-            @foreach ($cart as $item)
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="text-xl">{{ $item->service->name }}</h3>
-                        <p class="text-gray-600">Price: ${{ $item->service->price }}</p>
-                        <p class="text-gray-500">Quantity: {{ $item->quantity }}</p>
-                    </div>
+                @foreach ($cart as $item)
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl">{{ $item->service->name }}</h3>
+                            <p class="text-gray-600">
+                                Price: Rp{{ number_format($item->service->min_price, 0, ',', '.') }} - Rp{{ number_format($item->service->max_price, 0, ',', '.') }}
+                            </p>
+                        </div>
 
-                    <form action="{{ route('cart.remove', $item->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button class="text-red-500">Remove</button>
-                    </form>
-                </div>
-            @endforeach
+                        <form action="{{ route('cart.remove', $item->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button class="text-red-500">Remove</button>
+                        </form>
+                    </div>
+                @endforeach
             </div>
 
-            <div class="mt-6 flex justify-between">
-                <h2 class="text-xl font-semibold">
-                    Total: ${{ $cart->sum('service.price') }}
-                </h2>
-
+            <div class="mt-6 flex justify-end">
                 <form action="{{ route('cart.clear') }}" method="POST">
                     @csrf
-                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Clear Cart</button>
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">
+                        Clear Cart
+                    </button>
                 </form>
             </div>
         @else

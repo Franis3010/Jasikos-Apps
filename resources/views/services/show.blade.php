@@ -111,6 +111,18 @@
                     <p>{{ $service->address ?? '-' }}</p>
                 </div>
 
+                <!-- Price Range Field -->
+                <div class="mb-4">
+                    <label class="block font-medium mb-1">Price Range</label>
+                    <p>
+                        @if ($service->min_price && $service->max_price)
+                            Rp{{ number_format($service->min_price, 0, ',', '.') }} - Rp{{ number_format($service->max_price, 0, ',', '.') }}
+                        @else
+                            -
+                        @endif
+                    </p>
+                </div>
+
                 <div class="mt-6 flex space-x-4">
                     <!-- Add to Wishlist Form -->
                     <form action="{{ route('wishlist.add', $service->id) }}" method="POST">

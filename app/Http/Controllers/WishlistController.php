@@ -13,11 +13,7 @@ class WishlistController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'You must be logged in to add to wishlist.');
-        }
-
-        $user->wishlist()->attach($serviceId);
+        $user->wishlist()->syncWithoutDetaching([$serviceId]);
 
         return redirect()->route('wishlist.index')->with('success', 'Service added to your wishlist!');
     }
