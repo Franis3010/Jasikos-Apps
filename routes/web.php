@@ -8,51 +8,63 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CartController;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Service;
+use App\Http\Controllers\AdminController;
 
-Route::get('/', function () {
-    $services = \App\Models\Service::all();
-    return view('home', compact('services'));
-  })->name('home');
-
+// Redirect guest users to login
 Route::middleware('guest')->get('/', function () {
     return redirect()->route('login');
 });
-Route::middleware('auth')->get('/', [HomeController::class, 'index'])->name('home');
+
+// Redirect authenticated users based on role
+Route::middleware('auth')->get('/', function () {
+    if (auth()->user()->role === 'admin') {
+        return redirect()->route('admin.home');
+    }
+
+    $services = Service::all();
+    return view('home', compact('services'));
+})->name('home');
+
+// Admin homepage route
+Route::middleware('auth')->get('/admin-home', [AdminController::class, 'index'])->name('admin.home');
+
+// Guest-only routes (login, register)
 Route::middleware('guest')->group(function () {
-    Route::get('/login',    [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login',   [LoginController::class, 'login']);
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register',[RegisterController::class, 'register']);
 });
 
+// Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    
-    // Service
+
+    // Service routes
     Route::get('/service/{id}', [ServiceController::class, 'show'])->name('service.show');
+    // Route::get('/service/{id}', [ServiceController::class, 'adminshow'])->name('service.adminshow');
     Route::get('/service/{id}/edit', [ServiceController::class, 'edit'])->name('service.edit');
     Route::put('/service/{id}', [ServiceController::class, 'update'])->name('service.update');
-    // wishlist
+    Route::get('/service', [ServiceController::class, 'browseForUser'])->name('service.browse');
+
+    // Wishlist routes
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/add/{id}', [WishlistController::class, 'add'])->name('wishlist.add');
     Route::delete('/wishlist/{service}', [WishlistController::class, 'remove'])->name('wishlist.remove');
-    // cart
+
+    // Cart routes
     Route::post('/cart/add/{service}', [CartController::class, 'add'])->name('cart.add');
-    Route::get('cart', [CartController::class, 'show'])->name('cart.show');
-    Route::post('cart/{id}/add', [CartController::class, 'add'])->name('cart.add');
-    Route::delete('cart/{id}/remove', [CartController::class, 'remove'])->name('cart.remove');
-    Route::post('cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+    Route::post('/cart/{id}/add', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/{id}/remove', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
-    // Profile (only if authenticated)
-    Route::middleware('auth')->get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::middleware('auth')->post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    // … any other protected routes …
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
+    // admin services rooutes
+    Route::get('/admin/services', [ServiceController::class, 'adminShow'])->name('service.adminshow');
 });
-
-
-
-

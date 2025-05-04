@@ -14,6 +14,7 @@ class CartController extends Controller
         $cart = Cart::with('service')->where('user_id', Auth::id())->get();
         return view('cart.index', compact('cart'));
     }
+    
     public function add(Request $request, $id)
     {
         $user = Auth::user();

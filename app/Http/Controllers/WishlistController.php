@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Auth;
 
 class WishlistController extends Controller
 {
-    public function add($serviceId)
+    public function add(Request $request, $serviceId)
     {
         $user = Auth::user();
 
         $user->wishlist()->syncWithoutDetaching([$serviceId]);
 
-        return redirect()->route('wishlist.index')->with('success', 'Service added to your wishlist!');
+        $redirectUrl = $request->input('redirect_url', route('wishlist.index'));
+
+        return redirect($redirectUrl)->with('success', 'Service added to your wishlist!');
     }
 
     public function remove($id)

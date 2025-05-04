@@ -10,7 +10,7 @@ class Kernel extends HttpKernel
      * The application's global HTTP middleware stack.
      */
     protected $middleware = [
-        // …
+        // … other global middleware …
     ];
 
     /**
@@ -18,10 +18,10 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            // …
+            // … other middleware for web …
         ],
         'api' => [
-            // …
+            // … other middleware for API …
         ],
     ];
 
@@ -33,6 +33,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth'  => \App\Http\Middleware\Authenticate::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'admin' => \App\Http\Middleware\CheckAdmin::class,  // Add this line
         // … other middleware …
     ];
 }
