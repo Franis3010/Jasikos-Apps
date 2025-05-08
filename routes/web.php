@@ -67,4 +67,7 @@ Route::middleware('auth')->group(function () {
 
     // admin services rooutes
     Route::get('/admin/services', [ServiceController::class, 'adminShow'])->name('service.adminshow');
+    Route::get('/admin/services/create', [ServiceController::class, 'create'])->name('service.create');
+    Route::post('/admin/services', [ServiceController::class, 'store'])->name('service.store');
+    Route::delete('/admin/services/{id}', [ServiceController::class, 'destroy'])->name('service.destroy');
 });

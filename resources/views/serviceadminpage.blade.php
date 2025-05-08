@@ -56,8 +56,8 @@
                     </div>
 
                     <a href="{{ route('profile.edit') }}" 
-                    class="block py-2 text-sm text-blue-500 hover:bg-gray-100 rounded">
-                        Edit Profile
+                        class="block py-2 text-sm text-blue-500 hover:bg-gray-100 rounded">
+                            Edit Profile
                     </a>
 
                     <form action="{{ route('logout') }}" method="POST" class="mt-2">
@@ -71,23 +71,44 @@
             </div>
         </div>
 
+        <!-- Add Service Button -->
+        <div class="container mx-auto px-4 mb-4">
+            <div class="flex justify-end">
+                <a href="{{ route('service.create') }}" 
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    + Add Service
+                </a>
+            </div>
+        </div>
+
         <!-- Main Content -->
         <div class="container mx-auto px-4 py-8">
             <h1 class="text-3xl font-bold text-center mb-8">All Services</h1>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach ($services as $service)
-                <a href="{{ route('service.edit', $service->id) }}" class="block hover:shadow-lg transition rounded-lg border p-4">
-                    <img src="{{ asset('storage/' . $service->image) }}" 
-                        alt="{{ $service->name }}" 
-                        class="w-full h-48 object-contain bg-white-100 rounded mb-4">
-                    
-                    <h3 class="text-lg font-bold">{{ $service->name }}</h3>
-                    <p class="text-sm text-gray-600">{{ $service->email }}</p>
-                    <p class="text-sm text-gray-600">{{ $service->phone }}</p>
-                    <p class="text-sm text-gray-600">{{ $service->address }}</p>
-                    <p class="text-sm text-gray-600">Price: Rp{{ number_format($service->min_price) }} - Rp{{ number_format($service->max_price) }}</p>
-                </a>
+                <div class="block hover:shadow-lg transition rounded-lg border p-4">
+                    <a href="{{ route('service.edit', $service->id) }}" class="block mb-4">
+                        <img src="{{ asset('storage/' . $service->image) }}" 
+                            alt="{{ $service->name }}" 
+                            class="w-full h-48 object-contain bg-white-100 rounded mb-4">
+                        
+                        <h3 class="text-lg font-bold">{{ $service->name }}</h3>
+                        <p class="text-sm text-gray-600">{{ $service->email }}</p>
+                        <p class="text-sm text-gray-600">{{ $service->phone }}</p>
+                        <p class="text-sm text-gray-600">{{ $service->address }}</p>
+                        <p class="text-sm text-gray-600">Price: Rp{{ number_format($service->min_price) }} - Rp{{ number_format($service->max_price) }}</p>
+                    </a>
+
+                    <!-- Delete Form -->
+                    <form action="{{ route('service.destroy', $service->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this service?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="mt-4 text-sm text-red-600 hover:text-red-800">
+                            Delete
+                        </button>
+                    </form>
+                </div>
                 @endforeach
             </div>
         </div>
