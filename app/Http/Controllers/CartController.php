@@ -44,6 +44,19 @@ class CartController extends Controller
         return redirect()->route('cart.show')->with('success', 'Cart cleared.');
     }
 
+    public function updateState(Request $request, $id)
+    {
+        $request->validate([
+            'state' => 'required|string',
+        ]);
+
+        $cartItem = Cart::findOrFail($id);
+        $cartItem->state = $request->input('state');
+        $cartItem->save();
+
+        return redirect()->route('cart.show')->with('success', 'Status updated successfully.');
+    }
+
     public function remove($id)
     {
         $user = Auth::user();
@@ -55,5 +68,29 @@ class CartController extends Controller
         }
 
         return redirect()->route('cart.show')->with('success', 'Item removed from your cart.');
+    }
+    public function accept(Request $request, $id)
+    {
+        $cart = Cart::with('service')->findOrFail($id);
+
+        $request->validate([
+            'price' => ['required', 'numeric', 'min:' . $cart->service->min_price, 'max:' . $cart->service->max_price],
+        ]);
+
+        $cart->price = $request->price;
+        $cart->state = Cart::STATE_IN_PROGRESS;
+        $cart->save();
+
+        return redirect()->back()->with('success', 'Request accepted with price updated.');
+    }
+
+    public function reject($id)
+    {
+        $cart = Cart::findOrFail($id);
+
+        $cart->state = Cart::STATE_CANCELLED;
+        $cart->save();
+
+        return redirect()->back()->with('success', 'Request has been rejected.');
     }
 }

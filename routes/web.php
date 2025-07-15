@@ -60,6 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/{id}/add', [CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/{id}/remove', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::patch('/cart/{id}/update-state', [CartController::class, 'updateState'])->name('cart.updateState');
+    Route::patch('/cart/{id}/accept', [CartController::class, 'accept'])->name('cart.accept');
+    Route::patch('/cart/{id}/reject', [CartController::class, 'reject'])->name('cart.reject');
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

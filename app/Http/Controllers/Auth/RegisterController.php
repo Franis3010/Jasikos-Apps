@@ -33,8 +33,6 @@ class RegisterController extends Controller
             'role'     => 'user',    // if you added role
         ]);
 
-        Auth::login($user);
-
-        return redirect($this->redirectTo);
+        return redirect()->route('login')->with('success', 'Registration successful. Please log in.');  
     }
 }

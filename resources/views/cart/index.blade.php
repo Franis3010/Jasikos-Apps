@@ -20,7 +20,6 @@
         <!-- Search + Icons -->
         <div class="flex-1 mx-8 flex items-center space-x-4">
 
-
             <!-- Wishlist Icon -->
             <a href="{{ route('wishlist.index') }}" class="text-gray-600 hover:text-red-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -42,7 +41,6 @@
 
         <!-- Profile Dropdown Button -->
         <div x-data="{ showProfile: false }" class="relative">
-            <!-- Icon Button -->
             <button @click="showProfile = !showProfile" class="focus:outline-none">
                 <img src="{{ auth()->user()->profile_picture 
                     ? asset('storage/' . auth()->user()->profile_picture) 
@@ -51,13 +49,11 @@
                     class="h-8 w-8 rounded-full object-cover">
             </button>
 
-            <!-- Dropdown Content -->
             <div x-show="showProfile" 
                 @click.outside="showProfile = false" 
                 x-cloak
                 class="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg p-4 z-50 text-center">
                 
-                <!-- User Info -->
                 <div class="flex flex-col items-center mb-4 space-y-2">
                     <img src="{{ auth()->user()->profile_picture 
                         ? asset('storage/' . auth()->user()->profile_picture) 
@@ -68,13 +64,11 @@
                     <p class="text-sm text-gray-600">{{ auth()->user()->email }}</p>
                 </div>
 
-                <!-- Edit Profile -->
                 <a href="{{ route('profile.edit') }}" 
                 class="block py-2 text-sm text-blue-500 hover:bg-gray-100 rounded">
                     Edit Profile
                 </a>
 
-                <!-- Logout -->
                 <form action="{{ route('logout') }}" method="POST" class="mt-2">
                     @csrf
                     <button type="submit" 
@@ -85,26 +79,69 @@
             </div>
         </div>
     </div>
+
     <div class="container mx-auto py-8">
         <h1 class="text-3xl font-bold mb-6">Shopping Cart</h1>
 
         @if (count($cart) > 0)
+
+            @php
+                $stateColors = [
+                    'draft' => 'text-gray-500',
+                    'sent' => 'text-yellow-500',
+                    'in_progress' => 'text-blue-500',
+                    'cancelled' => 'text-red-500',
+                    'unpaid' => 'text-pink-500',
+                    'complete' => 'text-green-600',
+                ];
+            @endphp
+
             <div class="space-y-4">
                 @foreach ($cart as $item)
-                    <div class="flex justify-between items-center">
+                <div class="border rounded-lg p-4 shadow-sm mb-4 relative">
+                    {{-- Status Box di pojok kanan atas --}}
+                    <div class="absolute top-2 right-2">
+                        <div class="skew-x-[-12deg] bg-gray-100 border border-black px-3 py-1 inline-block">
+                            <span class="skew-x-[12deg] text-sm text-gray-800 font-medium">
+                                Status: <span class="font-bold capitalize">{{ str_replace('_', ' ', $item->state) }}</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-2 pt-8"> <!-- tambah pt-8 untuk beri ruang vertikal -->
+                        {{-- Info layanan --}}
                         <div>
-                            <h3 class="text-xl">{{ $item->service->name }}</h3>
+                            <h3 class="text-xl font-semibold">{{ $item->service->name }}</h3>
                             <p class="text-gray-600">
                                 Price: Rp{{ number_format($item->service->min_price, 0, ',', '.') }} - Rp{{ number_format($item->service->max_price, 0, ',', '.') }}
                             </p>
                         </div>
 
-                        <form action="{{ route('cart.remove', $item->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button class="text-red-500">Remove</button>
-                        </form>
+                        {{-- Tombol Mark as Sent & Remove --}}
+                        <div class="flex space-x-2">
+                            @if ($item->state == 'draft')
+                                <form action="{{ route('cart.updateState', $item->id) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="state" value="sent">
+                                    <button type="submit"
+                                        class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1 rounded text-sm font-medium">
+                                        Mark as Sent
+                                    </button>
+                                </form>
+                            
+                                <form action="{{ route('cart.remove', $item->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded text-sm font-medium">
+                                        Remove
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
+                </div>
                 @endforeach
             </div>
 
