@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-<<<<<<< HEAD
 use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
@@ -24,25 +23,8 @@ class RedirectIfAuthenticated
             if (Auth::guard($guard)->check()) {
                 return redirect(RouteServiceProvider::HOME);
             }
-=======
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
-class RedirectIfAuthenticated
-{
-    public function handle(Request $request, Closure $next, $guard = null)
-    {
-        if (Auth::guard($guard)->check()) {
-            // already logged in → send to “/” (home)
-            return redirect('/');
->>>>>>> b83671218a72768156921f193e46e08c4ea4ba4b
         }
 
         return $next($request);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> b83671218a72768156921f193e46e08c4ea4ba4b
