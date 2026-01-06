@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Customer extends Model
 {
     use HasFactory;
+       protected $guarded = [];
 
-    protected $fillable = ['name', 'email', 'phone', 'address'];
+    public function user(): BelongsTo { return $this->belongsTo(User::class); }
 
-    public function services()
+    public function cart()
     {
-        return $this->hasMany(Service::class); // or any relationship you need
+        return $this->hasOne(\App\Models\Cart::class);
     }
 }

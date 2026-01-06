@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Service;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\{Design, Category};
 
 class HomeController extends Controller
 {
     public function index()
     {
-        // Check if the logged-in user is an admin
-        if (Auth::user()->role == 'admin') {
-            return redirect()->route('admin.home');
-        }
+        $latest = Design::with(['categories','designer.user'])
+            ->where('status','published')
+            ->latest()
+            ->take(8)
+            ->get();
 
-        // Regular homepage for non-admin users
-        $services = Service::all();
-        return view('home', compact('services'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('home', compact('latest','categories'));
     }
 }

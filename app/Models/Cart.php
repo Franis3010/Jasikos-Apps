@@ -2,59 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'service_id',
-        'quantity',
-        'state',
-        'price',
-    ];
+    use HasFactory;
 
-    public function user()
+    protected $guarded = [];
+
+    public function customer()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Customer::class);
     }
-
-    public function service()
+    public function items()
     {
-        return $this->belongsTo(Service::class);
+        return $this->hasMany(CartItem::class);
     }
-
-    // State constants
-    const STATE_DRAFT = 'draft';
-    const STATE_SENT = 'sent';
-    const STATE_IN_PROGRESS = 'in_progress';
-    const STATE_CANCELLED = 'cancelled';
-    const STATE_UNPAID = 'unpaid';
-    const STATE_COMPLETE = 'complete';
-
-    // Get all possible states
-    public static function getStates()
-    {
-        return [
-            self::STATE_DRAFT,
-            self::STATE_SENT,
-            self::STATE_IN_PROGRESS,
-            self::STATE_CANCELLED,
-            self::STATE_UNPAID,
-            self::STATE_COMPLETE,
-        ];
-    }
-
-    // Optional: checkers
-    public function isDraft()
-    {
-        return $this->state === self::STATE_DRAFT;
-    }
-
-    public function isComplete()
-    {
-        return $this->state === self::STATE_COMPLETE;
-    }
-
-    // ...tambahkan metode sejenis jika perlu
 }
