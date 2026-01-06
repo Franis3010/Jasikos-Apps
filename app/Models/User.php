@@ -19,6 +19,15 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+<<<<<<< HEAD
+=======
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',         // ← add this
+    ];
+>>>>>>> b83671218a72768156921f193e46e08c4ea4ba4b
 
     /**
      * The attributes that should be hidden for serialization.
@@ -41,6 +50,18 @@ class User extends Authenticatable
     ];
 
 
+<<<<<<< HEAD
     public function designer(): HasOne { return $this->hasOne(Designer::class); }
     public function customer(): HasOne { return $this->hasOne(Customer::class); }
+=======
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+>>>>>>> b83671218a72768156921f193e46e08c4ea4ba4b
 }

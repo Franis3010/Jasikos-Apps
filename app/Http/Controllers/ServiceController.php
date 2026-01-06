@@ -41,4 +41,17 @@ class ServiceController extends Controller
 
         return redirect()->route('service.show', $id)->with('success', 'Service updated successfully.');
     }
+
+    public function index(Request $request)
+    {
+        $query = Service::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $services = $query->get();
+
+        return view('services.index', compact('services'));
+    }
 }
