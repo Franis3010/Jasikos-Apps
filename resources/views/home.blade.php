@@ -1,135 +1,555 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Jasikos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="//unpkg.com/alpinejs" defer></script>
-</head>
-<body class="bg-white" x-data="{showLogin: {{ session('showLogin') ? 'true' : 'false' }}, showRegister: false}">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-        <!-- Logo -->
-        <div class="flex-shrink-0">
-            <a href="{{ url('/') }}">
-                <img src="{{ asset('storage/services/jasikos-logo.png') }}" alt="Jasikos Logo" class="h-12">
-            </a>
+@extends('layouts.landingpages.app')
+@section('title', 'Beranda')
+
+@section('content')
+    @php
+        $slides = ($latest ?? collect())->take(3);
+    @endphp
+
+    {{-- ========== HERO ========== --}}
+    <section class="mb-4">
+        <div class="rounded-4 overflow-hidden position-relative hero hero--compact">
+            <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4500"
+                data-bs-pause="hover">
+
+                {{-- Indicators (bottom-right, small dots) --}}
+                <div class="carousel-indicators">
+                    @foreach ($slides as $i => $s)
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}"
+                            class="{{ $i === 0 ? 'active' : '' }}" aria-current="{{ $i === 0 ? 'true' : 'false' }}"
+                            aria-label="Slide {{ $i + 1 }}"></button>
+                    @endforeach
+                </div>
+
+                <div class="carousel-inner">
+                    @forelse($slides as $i => $d)
+                        <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+                            @if ($d->thumbnail)
+                                <img src="{{ asset('storage/' . $d->thumbnail) }}" class="d-block w-100"
+                                    style="height:var(--hero-h);object-fit:cover;object-position:center;"
+                                    alt="{{ $d->title }}" loading="lazy">
+                            @else
+                                <div class="bg-light w-100" style="height:var(--hero-h)"></div>
+                            @endif
+
+                            {{-- Soft overlay --}}
+                            <div class="position-absolute top-0 start-0 w-100 h-100"
+                                style="background:linear-gradient(180deg,rgba(0,0,0,.12) 0%,rgba(0,0,0,.3) 60%,rgba(0,0,0,.55) 100%);">
+                            </div>
+
+                            {{-- Caption (bottom-left) --}}
+                            <div class="carousel-caption text-start hero-caption-compact">
+                                <div class="container-fluid px-3 px-md-4">
+                                    <div class="col-xl-5 col-lg-6">
+                                        <span class="hero-chip mb-2">
+                                            {{ $d->designer->display_name ?? ($d->designer->user->name ?? 'Designer') }}
+                                        </span>
+                                        <h2 class="hero-title-compact mb-2">{{ $d->title }}</h2>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <a href="{{ route('designs.show', $d->slug) }}"
+                                                class="btn btn-dark btn-sm rounded-pill px-3">
+                                                View Details
+                                            </a>
+                                            <a href="{{ route('designs.index') }}"
+                                                class="btn btn-outline-light btn-sm rounded-pill px-3 border-2">
+                                                Browse Catalog
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="carousel-item active">
+                            <div class="bg-light w-100" style="height:var(--hero-h)"></div>
+                            <div class="carousel-caption text-start hero-caption-compact">
+                                <div class="container-fluid px-3 px-md-4">
+                                    <div class="col-xl-5 col-lg-6">
+                                        <span class="hero-chip mb-2">Jasikos</span>
+                                        <h2 class="hero-title-compact mb-2">Cosplay Design Services</h2>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <a href="{{ route('designs.index') }}"
+                                                class="btn btn-dark btn-sm rounded-pill px-3">Browse Catalog</a>
+                                            <a href="{{ route('login') }}"
+                                                class="btn btn-outline-light btn-sm rounded-pill px-3 border-2">Request
+                                                Custom</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"
+                    aria-label="Previous">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"
+                    aria-label="Next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    {{-- ===== ABOUT BLURB (right-aligned) ===== --}}
+    <section class="py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 d-none d-lg-block"></div>
+            <div class="col-lg-6">
+                <div class="text-center text-md-end">
+                    <div class="about-blurb fw-semibold lh-sm">
+                        {{ setting('home_about_blurb', 'We help cosplayers & brands turn ideas into production-ready visuals—clean, precise, and ready to use.') }}
+                    </div>
+
+
+                    <div class="mt-3">
+                        <a href="{{ url('/about') }}"
+                            class="btn btn-dark rounded-pill px-4 d-inline-flex align-items-center gap-2">
+                            ABOUT
+                            <i class="fa-solid fa-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {{-- ========== KATEGORI ========== --}}
+    {{-- ========== KATEGORI (chip rail elegan) ========== --}}
+    @php($currentCat = request('category'))
+    <section class="section-thick-top py-6">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 section-title">Browse categories</h5>
+            {{-- <a href="{{ route('designs.index') }}" class="small text-decoration-none">See all</a> --}}
         </div>
 
-        <!-- Search + Icons -->
-        <div class="flex-1 mx-8 flex items-center space-x-4">
-            @if (Request::is('/'))
-                <form action="{{ route('home') }}" method="GET" class="w-full flex">
-                    <input
-                        type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Search services..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                </form>
-            @endif
+        <div class="cat-rail position-relative">
+            <div class="cat-rail-scroller d-flex flex-nowrap gap-2 overflow-auto pb-1">
+                <a href="{{ route('designs.index') }}"
+                    class="btn rounded-pill cat-chip {{ request('category') ? '' : 'active' }}">All</a>
+                @foreach ($categories as $c)
+                    <a href="{{ route('designs.index', ['category' => $c->slug]) }}"
+                        class="btn rounded-pill cat-chip {{ request('category') === $c->slug ? 'active' : '' }}">
+                        {{ $c->name }}
+                    </a>
+                @endforeach
+            </div>
+            <div class="cat-fade cat-fade--left d-none d-md-block"></div>
+            <div class="cat-fade cat-fade--right d-none d-md-block"></div>
+        </div>
+    </section>
 
-            <!-- Wishlist Icon -->
-            <a href="{{ route('wishlist.index') }}" class="text-gray-600 hover:text-red-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/>
-                </svg>
-            </a>
-
-            <!-- Basket Icon -->
-            <a href="{{ route('cart.show') }}" class="text-gray-600 hover:text-yellow-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 7M7 13l-1.293 2.586A1 1 0 007 17h10a1 1 0 00.894-1.447L17 13M10 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z"/>
-                </svg>
-            </a>
+    {{-- ========== DESAIN TERBARU ========== --}}
+    <section class="section-thick-top py-6">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0 section-title">Latest Design</h4>
+            {{-- <a href="{{ route('designs.index') }}" class="small text-decoration-none">Lihat semua</a> --}}
         </div>
 
-        <!-- Login Button -->
-        <button @click="showLogin = true" class="text-gray-600 hover:text-blue-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 20c0 1.104.896 2 2 2h10c1.104 0 2-.896 2-2v-2c0-3.314-4-5-6-5s-6 1.686-6 5v2zM12 11c2.209 0 4-1.791 4-4S14.209 3 12 3 8 4.791 8 7s1.791 4 4 4z"/>
-            </svg>
-        </button>
-    </div>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @forelse ($latest as $d)
+                @php($designer = $d->designer->display_name ?? ($d->designer->user->name ?? '-'))
+                <div class="col">
+                    <div class="tile-wrap">
+                        <a href="{{ route('designs.show', $d->slug) }}" class="d-block text-decoration-none text-reset">
+                            <div class="tile rounded-4 overflow-hidden ratio ratio-16x9 bg-light position-relative">
+                                @if ($d->thumbnail)
+                                    <img src="{{ asset('storage/' . $d->thumbnail) }}" class="w-100 h-100"
+                                        style="object-fit:cover" alt="{{ $d->title }}">
+                                @endif
+                            </div>
+                        </a>
+                        {{-- META di LUAR card, muncul saat hover --}}
+                        <div class="tile-meta">
+                            <div class="fw-semibold">{{ $d->title }}</div>
+                            <div class="text-muted small">{{ $designer }}</div>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12 text-muted">No design yet.</div>
+            @endforelse
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-bold text-center mb-10">Designer</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            @foreach ($services as $service)
-            <a href="{{ route('service.show', $service->id) }}" class="block bg-white rounded-xl shadow p-4 text-center hover:shadow-lg transition-shadow duration-300">
-            <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}" class="w-full max-h-80 object-contain rounded-lg mb-4 bg-white">
-                <h2 class="text-xl font-semibold mb-2">{{ $service->name }}</h2>
+            {{-- Tile abu-abu "Lihat Semua Desain" --}}
+            <div class="col">
+                <a href="{{ route('designs.index') }}" class="d-block text-decoration-none">
+                    <div class="rounded-4 ratio ratio-16x9 cta-all">
+                        <div class="d-flex align-items-center justify-content-center text-center w-100 h-100">
+                            <span class="fw-semibold text-dark cta-label">
+                                See all designs</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
 
-                <form action="{{ route('wishlist.add', $service->id) }}" method="POST" class="mt-2">
-                    @csrf
-                    <button type="submit" class="text-gray-600 hover:text-red-500">
-                        ❤️ Add to Wishlist
-                    </button>
-                </form>
-            </a>
-            @endforeach
         </div>
-    </div>
+    </section>
+    {{-- ========== HOW IT WORKS ========== --}}
+    <section class="section-thick-top py-6">
+        <h4 class="mb-4">How It Works</h4>
 
-    <!-- Login Modal -->
-    <div x-show="showLogin" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-full max-w-md relative">
-            <button @click="showLogin = false" class="absolute top-2 right-2 text-gray-600 hover:text-black">&times;</button>
-            <h2 class="text-2xl font-bold mb-4">Login</h2>
-            <form action="{{ route('login') }}" method="POST">
-                @csrf
-                <input type="email" name="email" placeholder="Email" class="w-full mb-3 p-2 border rounded" required>
-                @error('email')
-                    <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
+        <div class="row gy-4">
+            <div class="col-md-4">
+                <div class="step-card h-100 p-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="step-dot">1</span>
+                        <h5 class="ms-2 mb-0">Choose / Request</h5>
+                    </div>
+                    <p class="text-muted mb-0 small">
+                        Add a design to cart or submit a custom request to a designer.
+                    </p>
+                </div>
+            </div>
 
-                <input type="password" name="password" placeholder="Password" class="w-full mb-3 p-2 border rounded" required>
-                @error('password')
-                    <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
+            <div class="col-md-4">
+                <div class="step-card h-100 p-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="step-dot">2</span>
+                        <h5 class="ms-2 mb-0">Payment</h5>
+                    </div>
+                    <p class="text-muted mb-0 small">
+                        Pay via bank/QRIS and upload the proof. The designer will confirm.
+                    </p>
+                </div>
+            </div>
 
-                <button type="submit" class="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Login</button>
-            </form>
-
-            <p class="mt-4 text-sm text-gray-600">Don't have an account? <a href="#" @click="showRegister = true" class="text-blue-500 hover:underline">Register here</a></p>
+            <div class="col-md-4">
+                <div class="step-card h-100 p-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="step-dot">3</span>
+                        <h5 class="ms-2 mb-0">Receive Files</h5>
+                    </div>
+                    <p class="text-muted mb-0 small">
+                        Download files according to status (paid / delivered / completed).
+                    </p>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+    {{-- ========== CTA ========== --}}
+    <section class="section-thick-top py-6 mt-2">
+        <div class="cta-panel d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div>
+                <h4 class="mb-1">Have a specific brief?</h4>
+                <div class="text-muted">Tell us what you need and our designers will send an offer.</div>
+            </div>
 
-    <!-- Register Modal -->
-    <div x-show="showRegister" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-full max-w-md relative">
-            <button @click="showRegister = false" class="absolute top-2 right-2 text-gray-600 hover:text-black">&times;</button>
-            <h2 class="text-2xl font-bold mb-4">Register</h2>
-            <form action="{{ route('register.submit') }}" method="POST">
-                @csrf
-                <input type="text" name="name" placeholder="Name" class="w-full mb-3 p-2 border rounded" required>
-                @error('name')
-                    <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
-
-                <input type="email" name="email" placeholder="Email" class="w-full mb-3 p-2 border rounded" required>
-                @error('email')
-                    <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
-
-                <input type="password" name="password" placeholder="Password" class="w-full mb-3 p-2 border rounded" required>
-                @error('password')
-                    <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
-
-                <input type="password" name="password_confirmation" placeholder="Confirm Password" class="w-full mb-3 p-2 border rounded" required>
-                @error('password_confirmation')
-                    <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
-
-                <button type="submit" class="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600">Register</button>
-            </form>
+            @auth
+                @if (auth()->user()->role === 'customer')
+                    <a class="btn btn-dark btn-lg rounded-pill px-4" href="{{ route('customer.custom-requests.create') }}">
+                        Create Custom Request
+                    </a>
+                @else
+                    <a class="btn btn-dark btn-lg rounded-pill px-4" href="{{ route('login') }}">
+                        Create Custom Request
+                    </a>
+                @endif
+            @else
+                <a class="btn btn-dark btn-lg rounded-pill px-4" href="{{ route('login') }}">
+                    Create Custom Request
+                </a>
+            @endauth
         </div>
-    </div>
-</body>
-</html>
+    </section>
+
+
+@endsection
+
+@push('styles')
+    <style>
+        :root {
+            /* DIBESARIN: tinggi hero */
+            --hero-h: clamp(360px, 68vh, 760px);
+            --hero-title-size: clamp(1.1rem, 1.1vw + 1rem, 1.85rem);
+        }
+
+        @media (min-width: 1200px) {
+            :root {
+                --hero-h: clamp(420px, 72vh, 820px);
+            }
+        }
+
+        /* caption kiri-bawah */
+        #heroCarousel .carousel-caption.hero-caption-compact {
+            bottom: 8.5%;
+        }
+
+        .hero-title-compact {
+            color: #fff;
+            font-weight: 600;
+            line-height: 1.15;
+            font-size: var(--hero-title-size);
+            letter-spacing: .2px;
+            margin: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+        }
+
+        .hero-chip {
+            display: inline-block;
+            padding: .28rem .6rem;
+            border-radius: 999px;
+            color: #fff;
+            font-size: .8rem;
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .25);
+            backdrop-filter: blur(4px);
+        }
+
+        .hero-caption-compact .btn {
+            box-shadow: 0 .3rem .8rem rgba(0, 0, 0, .12);
+        }
+
+        .hero-caption-compact .btn-outline-light {
+            --bs-btn-hover-color: #000;
+            --bs-btn-hover-bg: #fff;
+        }
+
+        /* INDICATORS PIN KE KANAN-BAWAH */
+        #heroCarousel .carousel-indicators {
+            position: absolute;
+            left: auto;
+            /* lepas center default */
+            right: .85rem;
+            /* geser ke kanan */
+            bottom: .85rem;
+            /* geser ke bawah */
+            transform: none;
+            /* hilangkan translateX(-50%) default */
+            width: auto;
+            /* supaya selebar konten */
+            margin: 0;
+            /* rapihin margin default */
+            gap: .35rem;
+            justify-content: flex-end;
+            z-index: 3;
+            /* pastikan di atas overlay */
+        }
+
+        #heroCarousel .carousel-indicators [data-bs-target] {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, .75);
+            opacity: .6;
+        }
+
+        #heroCarousel .carousel-indicators .active {
+            width: 10px;
+            height: 10px;
+            opacity: 1;
+            background-color: #fff;
+        }
+
+        /* responsif */
+        @media (max-width:575.98px) {
+            #heroCarousel .carousel-caption.hero-caption-compact {
+                bottom: 7.5%;
+            }
+
+            .hero-chip {
+                font-size: .75rem;
+                padding: .24rem .55rem;
+            }
+        }
+
+        .about-blurb {
+            font-size: clamp(1.25rem, 1.1vw + 1rem, 2rem);
+            letter-spacing: .2px;
+        }
+
+        /* Rail */
+        .cat-rail {
+            position: relative;
+        }
+
+        .cat-rail-scroller {
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cat-rail-scroller>* {
+            scroll-snap-align: start;
+        }
+
+        /* Chip look */
+        .cat-chip {
+            --chip-bg: #fff;
+            --chip-border: #e5e7eb;
+            --chip-text: #111;
+            --chip-bg-active: #111;
+            --chip-text-active: #fff;
+
+            background: var(--chip-bg);
+            border: 1px solid var(--chip-border);
+            color: var(--chip-text);
+            padding: .45rem .85rem;
+            font-size: .9rem;
+            line-height: 1;
+        }
+
+        .cat-chip:hover {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        .cat-chip.active {
+            background: var(--chip-bg-active);
+            color: var(--chip-text-active);
+            border-color: var(--chip-bg-active);
+        }
+
+        /* Fade edges */
+        .cat-fade {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 42px;
+            pointer-events: none;
+        }
+
+        .cat-fade--left {
+            left: 0;
+            background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0));
+        }
+
+        .cat-fade--right {
+            right: 0;
+            background: linear-gradient(270deg, #fff, rgba(255, 255, 255, 0));
+        }
+
+        /* Tipis-in scrollbar (opsional) */
+        .cat-rail-scroller::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .cat-rail-scroller::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        /* Latar abu default card */
+        /* efek zoom gambar */
+        .tile img {
+            transition: transform .45s ease;
+        }
+
+        .tile-wrap:hover .tile img {
+            transform: scale(1.03);
+        }
+
+        /* meta di bawah card: hidden dulu, muncul halus saat hover */
+        .tile-meta {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+            transition: max-height .25s ease, opacity .25s ease, margin-top .25s ease;
+        }
+
+        .tile-wrap:hover .tile-meta {
+            max-height: 80px;
+            /* cukup untuk 2 baris */
+            opacity: 1;
+            margin-top: .5rem;
+        }
+
+        /* kartu abu-abu untuk CTA 'Lihat Semua Desain' */
+        .cta-all {
+            background: var(--bs-secondary-bg, #e9ecef);
+            /* abu elegan (BS 5.3 aware) */
+            transition: filter .2s ease, transform .2s ease;
+        }
+
+        .cta-all:hover {
+            filter: brightness(.95);
+            transform: translateY(-2px);
+        }
+
+        /* Jarak vertikal ekstra ala “py-6” */
+        .py-6 {
+            padding-top: 3.5rem !important;
+            padding-bottom: 3.5rem !important;
+        }
+
+        /* Garis pemisah tebal & jarak lega di atas section */
+        .section-thick-top {
+            border-top: 3px solid #000 !important;
+            margin-top: 2.25rem;
+            /* jarak sebelum garis */
+        }
+
+        .cta-label {
+            font-size: clamp(1.1rem, .7vw + 1rem, 1.5rem);
+        }
+
+
+        /* Kartu langkah: elegan, tegas */
+        .step-card {
+            border: 1.6px solid #000;
+            border-radius: 1rem;
+            transition: transform .18s ease, box-shadow .18s ease;
+            background: #fff;
+        }
+
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+        }
+
+        /* Bulatan nomor */
+        .step-dot {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: #000;
+            color: #fff;
+            font-weight: 700;
+            font-size: .95rem;
+        }
+
+        /* Panel CTA elegan */
+        .cta-panel {
+            border: 2px solid #000;
+            border-radius: 1rem;
+            padding: 1.5rem 1.75rem;
+            background: #fff;
+        }
+
+        /* Responsif kecil: rapikan padding */
+        @media (max-width: 575.98px) {
+            .cta-panel {
+                padding: 1.25rem 1.25rem;
+            }
+        }
+
+        /* Tipisin separator & bingkai biar lebih elegan */
+        .section-thick-top {
+            border-top: 1.5px solid rgba(0, 0, 0, .85) !important;
+        }
+
+        .step-card {
+            border-width: 1.2px;
+        }
+
+        .cta-panel {
+            border-width: 1.5px;
+        }
+
+        .section-title {
+            font-weight: 700;
+            letter-spacing: .2px;
+            font-size: clamp(1.25rem, 0.9vw + 1.1rem, 2rem);
+            line-height: 1.2;
+        }
+
+        /* Tambah ruang antar judul & konten section */
+        .section-thick-top .section-title {
+            margin-bottom: .25rem;
+        }
+    </style>
+@endpush

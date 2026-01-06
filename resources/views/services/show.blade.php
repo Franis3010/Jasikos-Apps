@@ -114,7 +114,7 @@
                         </button>
                     </form>
 
-                    <form action="{{ route('cart.add', $service->id) }}" method="POST">
+                    <form action="{{ route('cart.add', $service->d) }}" method="POST">
                         @csrf
                         <button type="submit" class="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold">
                             Add to Cart
